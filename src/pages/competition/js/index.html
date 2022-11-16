@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title> Python 在线编辑和运行 </title>
+    <script type="text/javascript" src="brython.js"></script>
+    <script type="text/javascript" src="brython_stdlib.js"></script>
+    <style type="text/css" media="screen">
+        #editor{
+            border: 1px solid lightgray;
+            margin: 1px;
+            height: 400px;
+            width: 75%;
+        }
+    </style>
+</head>
+
+<body onload="brython()">
+<p style="color: #5f9bff">在做题过程中可以借助pyhton编译器来调试程序，最终代码已提交到具体题目中的输入框中为准。</p>
+    <script src="./src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="./src-noconflict/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+    <script src="./src-noconflict/mode-powershell.js" type="text/javascript" charset="utf-8"></script>
+    <div id="editor"># TODO: write code... </div>
+
+    <button id="btn"> 测试运行 </button>
+    <button id="ref_ans"> 参考代码 </button>
+    <button id="clear"> 清空 </button>
+<p style="color: #5f9bff">运行结果：</p>
+    <div style="width: 75%;padding-left:30px;background: #ffffff">
+
+        <p id="codeResult" style="min-height: 100px"></p>
+    </div>
+    <script type="text/python3">
+        from browser import document as doc, window as win
+        import sys
+
+        # 执行 Python 代码，代码从编辑器 editor 中获取。
+        def run(event):
+            exec(win.editor.getValue())
+
+        # 参考、演示代码
+        def ref_ans(ev):
+            code = '''print("这是一段演示代码")'''
+            # 发送到编辑窗口
+            win.editor.setValue(code)
+
+        # 清空编辑窗口
+        def clear(ev):
+            win.editor.setValue("")
+
+        # 绑定"click"事件到按钮
+
+        a = doc["btn"].bind("click", run)
+        doc["ref_ans"].bind("click", ref_ans)
+        doc["clear"].bind("click", clear)
+
+    </script>
+    <script>
+        var btn = document.getElementById("btn");
+        var clear = document.getElementById("clear");
+        clear.addEventListener("click",function(e){
+            var p = document.getElementById("codeResult");
+            p.innerText ='';
+        },false);
+        btn.addEventListener("click",function(e){
+            var p = document.getElementById("codeResult");
+            p.innerText ='';
+        },false);
+
+    </script>
+    <script type="text/javascript">
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/xcode");
+        editor.session.setMode("ace/mode/python");
+        editor.setFontSize(12);
+
+        //自动换行,设置为off关闭
+        editor.setOption("wrap", "free")
+
+        //启用提示菜单
+        ace.require("ace/ext/language_tools");
+        editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: true
+        });
+    </script>
+    <script>
+        var lastLog;
+        console.oldLog = console.log;
+        console.log = function(str) {
+            console.oldLog(str);
+            lastLog = str;
+            var p = document.getElementById("codeResult");
+            p.innerText =lastLog+p.innerText;
+        }
+    </script>
+    <script>
+
+        setTimeout("var p = document.getElementById(\"codeResult\");\n" +
+                "            p.innerText =' '",500)
+    </script>
+</body>
+
+</html>
