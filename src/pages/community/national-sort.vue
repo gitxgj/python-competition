@@ -6,6 +6,7 @@ export default {
   data() {
     return {};
   },
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   mounted() {},
 
   methods: {},
