@@ -5,7 +5,7 @@
         <t-tab-panel v-for="(tab, tabIndex) in TAB_LIST" :key="tabIndex" :value="tab.value" :label="tab.label">
           <t-list v-if="msgDataList.length > 0" class="secondary-msg-list" :split="true">
             <t-list-item v-for="(item, index) in msgDataList" :key="index">
-              <p :class="['content', { unread: item.status }]" @click="setReadStatus(item)">
+              <p >
                 <t-tag size="small" :theme="NOTIFICATION_TYPES[item.quality]" variant="light">
                   {{ item.type }}
                 </t-tag>
@@ -29,6 +29,11 @@
                       <delete-icon size="16px" />
                     </span>
                   </t-tooltip>
+                  <t-tooltip content="审批" :overlay-style="{ margin: '6px' }">
+                    <span @click="handleClickDeleteBtn(item)">
+                      <edit1-icon size="16px" />
+                    </span>
+                  </t-tooltip>
                 </div>
               </template>
             </t-list-item>
@@ -50,7 +55,7 @@
 </template>
 <script lang="ts">
 import { mapState, mapGetters } from 'vuex';
-import { QueueIcon, DeleteIcon, ChatIcon } from 'tdesign-icons-vue';
+import { QueueIcon, DeleteIcon, ChatIcon, Edit1Icon  } from 'tdesign-icons-vue';
 import { prefix } from '@/config/global';
 import { NOTIFICATION_TYPES } from '@/constants';
 import { msgDataItem } from '@/store/modules/notification';
@@ -74,7 +79,7 @@ export default {
   name: 'DetailSecondary',
   components: {
     QueueIcon,
-    DeleteIcon,
+    DeleteIcon,Edit1Icon,
     ChatIcon,
   },
   data() {

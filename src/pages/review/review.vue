@@ -5,11 +5,11 @@
         <t-tab-panel v-for="(tab, tabIndex) in TAB_LIST" :key="tabIndex" :value="tab.value" :label="tab.label">
           <t-list v-if="msgDataList.length > 0" class="secondary-msg-list" :split="true">
             <t-list-item v-for="(item, index) in msgDataList" :key="index">
-              <p :class="['content', { unread: item.status }]" @click="setReadStatus(item)">
-                <t-tag size="small" :theme="NOTIFICATION_TYPES[item.quality]" variant="light">
+              <p :class="['content', { unread: item.pass }]" @click="setReadStatus(item)">
+                <t-tag size="small" :theme="NOTIFICATION_TYPES[item.reviewUserId===null?'high':'low']" variant="light">
                   {{ item.type }}
                 </t-tag>
-                {{ item.content }}
+                {{ item.reviewUserId===null?'未评审':'已评审' }}
               </p>
               <template #action>
                 <span class="msg-date">{{ item.date }}</span>
@@ -24,9 +24,9 @@
                       <chat-icon v-else />
                     </span>
                   </t-tooltip>
-                  <t-tooltip content="删除通知" :overlay-style="{ margin: '6px' }">
+                  <t-tooltip content="审批" :overlay-style="{ margin: '6px' }">
                     <span @click="handleClickDeleteBtn(item)">
-                      <delete-icon size="16px" />
+                      <edit1-icon size="16px" />
                     </span>
                   </t-tooltip>
                 </div>
@@ -61,10 +61,10 @@
 </template>
 <script lang="ts">
 import { mapState, mapGetters } from 'vuex';
-import { QueueIcon, DeleteIcon, ChatIcon } from 'tdesign-icons-vue';
+import { QueueIcon, DeleteIcon, ChatIcon,Edit1Icon } from 'tdesign-icons-vue';
 import { prefix } from '@/config/global';
 import { NOTIFICATION_TYPES } from '@/constants';
-import { msgDataItem } from '@/store/modules/notification';
+import { msgDataItem } from '@/store/modules/review-record';
 
 const TAB_LIST = [
   {
@@ -84,7 +84,7 @@ const TAB_LIST = [
 export default {
   name: 'DetailSecondary',
   components: {
-    QueueIcon,
+    QueueIcon,Edit1Icon,
     DeleteIcon,
     ChatIcon,
   },
@@ -97,13 +97,18 @@ export default {
       prefix,
       data: [],
       tabValue: 'msgData',
+      msgData:[],
+      unreadMsg:[],
+      readMsg:[],
       visible: false,
       selectedItem: undefined,
     };
   },
+  mounted() {
+
+    this.initAllReview()
+  },
   computed: {
-    ...mapState('notification', ['msgData']),
-    ...mapGetters('notification', ['unreadMsg', 'readMsg']),
     msgDataList() {
       if (this.tabValue === 'msgData') return this.msgData;
       if (this.tabValue === 'unreadMsg') return this.unreadMsg;
@@ -113,8 +118,10 @@ export default {
   },
   methods: {
     initAllReview(){
-      this.$axiosPostWithQuery('/competitionRecord/list',null,this.pageInfo).then(
-        res =>{}
+      this.$axiosPostWithQuery('reviewRecord/list',null,this.pageInfo).then(
+        res =>{
+          this.msgData = res.result.data.records
+        }
 
       )
     },
