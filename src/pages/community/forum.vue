@@ -14,6 +14,7 @@
         </t-card>
       </t-space>
     </template>
+    <div style="padding-left: 50px;padding-right: 50px">
     <t-space direction="vertical">
       <t-radio-group v-model="asyncLoadingRadio" variant="default-filled">
         <t-radio-button value="load-more">加载更多</t-radio-button>
@@ -22,12 +23,13 @@
         <t-radio-button value="">加载完成</t-radio-button>
       </t-radio-group>
 
-      <t-list :async-loading="asyncLoading" @load-more="loadMore" split stripe size="large">
-        <t-list-item v-for="i in listCount" :key="i">
-          <t-list-item-meta :image="imageUrl" title="列表标题" description="列表内容的描述性文字"></t-list-item-meta>
+      <t-list  style="width: 300%;" :async-loading="asyncLoading" @load-more="loadMore" split stripe size="large" >
+        <t-list-item style="width: 200%;" v-for="i in listCount" :key="i">
+          <t-list-item-meta  style="width: 200%;" :image="imageUrl" title="列表标题" description="列表内容的描述性文字"></t-list-item-meta>
         </t-list-item>
       </t-list>
     </t-space>
+    </div>
   </div>
 
 </template>

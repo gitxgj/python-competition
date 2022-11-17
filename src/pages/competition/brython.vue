@@ -86,8 +86,18 @@ export default {
       this.$axiosPost('reviewRecord/add', param).then((res) => {
         if (res.status != null && res.status.success === true) {
           this.$message.success('提交成功！');
+          let routeUrl = this.$router.replace({
+            path: '/result/success',
+            query: { score: -1, isPass: 2 },
+          });
+          window.open(routeUrl.href, '_self');
         } else {
           this.$message.error('提交失败');
+          let routeUrl = this.$router.replace({
+            path: '/result/success',
+            query: { score: -2, isPass: 3 },
+          });
+          window.open(routeUrl.href, '_self');
         }
       });
     },

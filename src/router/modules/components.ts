@@ -69,7 +69,7 @@ export default [
       {
         path: 'Review',
         name: 'Review',
-        component: () => import('@/pages/competition/review.vue'),
+        component: () => import('@/pages/review/review.vue'),
         meta: { title: '比赛评审' },
       },
     ],

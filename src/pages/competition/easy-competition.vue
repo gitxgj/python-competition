@@ -1,8 +1,8 @@
 <template>
   <div>
-    <t-button type="submit" @click="testSubmit()">提交</t-button>
+    <t-button type="submit" @click="onSubmit()">提交</t-button>
     <hr />
-    <t-collapse>
+    <t-collapse    expandIconPlacement="right" defaultExpandAll>
       <t-collapse-panel
         v-for="(item, index) in choiceQuestionList"
         :key="index"
@@ -92,11 +92,11 @@ export default {
       };
 
       await this.$axiosPost('competitionRecord/add', params).then((res) => {
-        if (res !== undefined && res.status.success === true) {
+        if ( res !== undefined && res.status.success === true) {
           this.$message.success('提交成功');
-          let routeUrl = this.$router.resolve({
+          let routeUrl = this.$router.replace({
             path: '/result/success',
-            query: { score: result },
+            query: { score: score, isPass: isPass },
           });
           window.open(routeUrl.href, '_self');
         } else {

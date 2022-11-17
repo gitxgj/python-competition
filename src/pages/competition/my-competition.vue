@@ -16,10 +16,7 @@
             :lg="4"
             :xs="6"
             :xl="3"
-            v-for="product in productList.slice(
-              pagination.pageSize * (pagination.current - 1),
-              pagination.pageSize * pagination.current,
-            )"
+            v-for="product in productList"
             :key="product.index"
           >
 
@@ -31,7 +28,7 @@
         <t-pagination
           v-model="pagination.current"
           :total="pagination.total"
-          :pageSizeOptions="[12, 24, 36]"
+          :pageSizeOptions="[8, 16, 24]"
           :page-size.sync="pagination.pageSize"
           @page-size-change="onPageSizeChange"
           @current-change="onCurrentChange"
@@ -90,7 +87,7 @@
 <script lang="ts">
 import { prefix } from '@/config/global';
 import { SearchIcon } from 'tdesign-icons-vue';
-import ProductCard from '@/components/product-card/index.vue';
+import ProductCard from '@/components/product-card/record-competition.vue';
 
 const INITIAL_DATA = {
   name: '',
@@ -109,7 +106,9 @@ export default {
   },
   data() {
     return {
-      pagination: { current: 1, pageSize: 12, total: 0 },
+      pagination: { current: 1, pageSize: 8, total: 0 },
+      pageInfo:{current:1,Size:8},
+      competitionRecordList:[],
       prefix,
       productList: [],
       value: 'first',
@@ -143,6 +142,7 @@ export default {
     },
   },
   mounted() {
+    this.initData();
     this.dataLoading = true;
     this.$request
       .get('/api/get-card-list')
@@ -164,12 +164,42 @@ export default {
       });
   },
   methods: {
-    onPageSizeChange(size: number): void {
+    async initData(){
+     await this.$axiosPostWithQuery('competitionRecord/list',null,this.pageInfo).then(
+        res =>{
+          if (res.status.success==true){
+            this.competitionRecordList = res.result.data.records
+            this.pagination={
+              current: this.pageInfo.current, pageSize: this.pageInfo.Size, total: res.result.total
+            }
+            this.productList = this.competitionRecordList;
+            this.pagination = {
+              ...this.pagination,
+            };
+          }else{
+            this.$message.error("请求失败");
+          }
+
+          }
+
+      )
+    },
+   onPageSizeChange(size: number): void {
       this.pagination.pageSize = size;
       this.pagination.current = 1;
+      this.pageInfo = {
+        current: 1,
+        Size:size,
+      }
+      this.initData()
     },
     onCurrentChange(current: number): void {
       this.pagination.current = current;
+      this.pageInfo = {
+        current: current,
+        Size:this.pagination.pageSize,
+      }
+      this.initData();
     },
     onSubmit({ result, firstError }): void {
       if (!firstError) {

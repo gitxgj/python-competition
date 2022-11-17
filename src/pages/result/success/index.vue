@@ -2,7 +2,6 @@
   <div>
     <div v-if="this.$route.query.isPass === '1'" class="result-success">
       <check-circle-icon class="result-success-icon" />
-      <error-circle-icon v-if="this.$route.query.isPass === '0'" class="result-fail-icon" />
       <div class="result-success-title">比赛通过</div>
 
       <div class="result-success-describe">点击查看详情查看具体情况</div>
@@ -11,13 +10,32 @@
         <t-button @click="() => this.$router.push('/detail/advanced')" theme="default">查看结果</t-button>
       </div>
     </div>
-    <div v-else class="result-fail">
+    <div v-if="this.$route.query.isPass === '0'" v-else class="result-fail">
       <error-circle-icon class="result-fail-icon" />
       <div class="result-fail-title">未通过</div>
       <div class="result-fail-describe">点击查看详情查看具体情况</div>
       <div>
         <t-button theme="default" @click="() => this.$router.push('/form/base')">返回首页</t-button>
         <t-button @click="() => this.$router.push('/detail/advanced')" theme="default">查看结果</t-button>
+      </div>
+    </div>
+    <div v-if="this.$route.query.isPass === '2'" class="result-success">
+      <check-circle-icon class="result-success-icon" />
+      <div class="result-success-title">提交成功</div>
+
+      <div class="result-success-describe">请等待评审</div>
+      <div>
+        <t-button @click="() => this.$router.push('/form/base')">返回首页</t-button>
+        <t-button @click="() => this.$router.push('/detail/advanced')" theme="default">查看评审进度</t-button>
+      </div>
+    </div>
+    <div v-if="this.$route.query.isPass === '3'" class="result-fail">
+      <check-circle-icon class="result-fail-icon" />
+      <div class="result-fail-title">提交失败</div>
+
+      <div class="result-fail-describe">请联系管理员处理</div>
+      <div>
+        <t-button @click="() => this.$router.push('/form/base')">返回首页</t-button>
       </div>
     </div>
   </div>
