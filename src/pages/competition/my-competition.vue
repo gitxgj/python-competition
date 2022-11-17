@@ -12,14 +12,7 @@
     <template v-if="pagination.total > 0 && !dataLoading">
       <div class="list-card-items">
         <t-row :gutter="[16, 16]">
-          <t-col
-            :lg="4"
-            :xs="6"
-            :xl="3"
-            v-for="product in productList"
-            :key="product.index"
-          >
-
+          <t-col :lg="4" :xs="6" :xl="3" v-for="product in productList" :key="product.index">
             <product-card :product="product" @delete-item="handleDeleteItem" @manage-product="handleManageProduct" />
           </t-col>
         </t-row>
@@ -107,8 +100,8 @@ export default {
   data() {
     return {
       pagination: { current: 1, pageSize: 8, total: 0 },
-      pageInfo:{current:1,Size:8},
-      competitionRecordList:[],
+      pageInfo: { current: 1, Size: 8 },
+      competitionRecordList: [],
       prefix,
       productList: [],
       value: 'first',
@@ -164,41 +157,39 @@ export default {
       });
   },
   methods: {
-    async initData(){
-     await this.$axiosPostWithQuery('competitionRecord/list',null,this.pageInfo).then(
-        res =>{
-          if (res.status.success==true){
-            this.competitionRecordList = res.result.data.records
-            this.pagination={
-              current: this.pageInfo.current, pageSize: this.pageInfo.Size, total: res.result.total
-            }
-            this.productList = this.competitionRecordList;
-            this.pagination = {
-              ...this.pagination,
-            };
-          }else{
-            this.$message.error("请求失败");
-          }
-
-          }
-
-      )
+    async initData() {
+      await this.$axiosPostWithQuery('competitionRecord/listBeiYong', null, this.pageInfo).then((res) => {
+        if (res.status.success === true) {
+          this.competitionRecordList = res.result.records;
+          this.pagination = {
+            current: this.pageInfo.current,
+            pageSize: this.pageInfo.Size,
+            total: res.result.total,
+          };
+          this.productList = this.competitionRecordList;
+          this.pagination = {
+            ...this.pagination,
+          };
+        } else {
+          this.$message.error('请求失败');
+        }
+      });
     },
-   onPageSizeChange(size: number): void {
+    onPageSizeChange(size: number): void {
       this.pagination.pageSize = size;
       this.pagination.current = 1;
       this.pageInfo = {
         current: 1,
-        Size:size,
-      }
-      this.initData()
+        Size: size,
+      };
+      this.initData();
     },
     onCurrentChange(current: number): void {
       this.pagination.current = current;
       this.pageInfo = {
         current: current,
-        Size:this.pagination.pageSize,
-      }
+        Size: this.pagination.pageSize,
+      };
       this.initData();
     },
     onSubmit({ result, firstError }): void {

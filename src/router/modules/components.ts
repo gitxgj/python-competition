@@ -3,6 +3,28 @@ import Layout from '@/layouts/index.vue';
 
 export default [
   {
+    path: '/review',
+    name: 'review',
+    component: Layout,
+    redirect: '/review/base',
+    meta: { title: '比赛评审', icon: ViewModuleIcon },
+    children: [
+      {
+        path: 'ReviewDetail',
+        name: 'ReviewDetail',
+        component: () => import('@/pages/review/review-detail.vue'),
+        meta: { title: '评审详情' },
+      },
+      {
+        path: 'ReviewRecord',
+        name: 'ReviewRecord',
+        component: () => import('@/pages/review/review.vue'),
+        meta: { title: '评审记录' },
+      },
+    ],
+  },
+
+  {
     path: '/community',
     name: 'community',
     component: Layout,

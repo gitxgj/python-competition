@@ -6,19 +6,20 @@
           <t-list v-if="msgDataList.length > 0" class="secondary-msg-list" :split="true">
             <t-list-item v-for="(item, index) in msgDataList" :key="index">
               <p :class="['content', { unread: item.pass }]" @click="setReadStatus(item)">
-                <t-tag size="small" :theme="NOTIFICATION_TYPES[item.reviewUserId===null?'high':'low']" variant="light">
-                  {{ item.type }}
+                <t-tag
+                  size="small"
+                  :theme="NOTIFICATION_TYPES[item.reviewUserId === null ? 'high' : 'low']"
+                  variant="light"
+                >
+                  {{ item.reviewUserId === null ? '未评审' : '已评审' }}
                 </t-tag>
-                {{ item.reviewUserId===null?'未评审':'已评审' }}
+                {{ '试卷编号:' + item.id }}
               </p>
+              <p></p>
               <template #action>
-                <span class="msg-date">{{ item.date }}</span>
+                <span class="msg-date">{{ '提交人：' + item.commonUserId }}</span>
                 <div class="msg-action">
-                  <t-tooltip
-                    class="set-read-icon"
-                    :overlay-style="{ margin: '6px' }"
-                    :content="item.status ? '设为已读' : '设为未读'"
-                  >
+                  <t-tooltip class="set-read-icon" :overlay-style="{ margin: '6px' }" content="查看">
                     <span class="msg-action-icon" @click="setReadStatus(item)">
                       <queue-icon v-if="!!item.status" size="16px" />
                       <chat-icon v-else />
@@ -34,7 +35,6 @@
             </t-list-item>
           </t-list>
 
-
           <div v-else class="secondary-msg-list__empty-list">
             <img src="https://tdesign.gtimg.com/pro-template/personal/nothing.png" alt="空" />
             <p>暂无通知</p>
@@ -42,14 +42,13 @@
           <t-pagination
             v-model="pagination.current"
             :total="pagination.total"
-            :pageSizeOptions="[8, 16, 24]"
+            :pageSizeOptions="[3, 16, 24]"
             :page-size.sync="pagination.pageSize"
             @page-size-change="onPageSizeChange"
             @current-change="onCurrentChange"
           />
         </t-tab-panel>
       </t-tabs>
-
     </div>
     <t-dialog
       header="删除通知"
@@ -61,7 +60,7 @@
 </template>
 <script lang="ts">
 import { mapState, mapGetters } from 'vuex';
-import { QueueIcon, DeleteIcon, ChatIcon,Edit1Icon } from 'tdesign-icons-vue';
+import { QueueIcon, DeleteIcon, ChatIcon, Edit1Icon } from 'tdesign-icons-vue';
 import { prefix } from '@/config/global';
 import { NOTIFICATION_TYPES } from '@/constants';
 import { msgDataItem } from '@/store/modules/review-record';
@@ -84,30 +83,28 @@ const TAB_LIST = [
 export default {
   name: 'DetailSecondary',
   components: {
-    QueueIcon,Edit1Icon,
-    DeleteIcon,
+    QueueIcon,
+    Edit1Icon,
+
     ChatIcon,
   },
   data() {
     return {
       pagination: { current: 1, pageSize: 8, total: 0 },
-      pageInfo:{current:1,Size:10,},
+      pageInfo: { current: 1, Size: 10 },
       NOTIFICATION_TYPES,
       TAB_LIST,
       prefix,
       data: [],
       tabValue: 'msgData',
-      msgData:[],
-      unreadMsg:[],
-      readMsg:[],
+      msgData: [],
+      unreadMsg: [],
+      readMsg: [],
       visible: false,
       selectedItem: undefined,
     };
   },
-  mounted() {
 
-    this.initAllReview()
-  },
   computed: {
     msgDataList() {
       if (this.tabValue === 'msgData') return this.msgData;
@@ -116,22 +113,32 @@ export default {
       return [];
     },
   },
+  mounted() {
+    this.initAllReview();
+  },
   methods: {
-    initAllReview(){
-      this.$axiosPostWithQuery('reviewRecord/list',null,this.pageInfo).then(
-        res =>{
-          this.msgData = res.result.data.records
-        }
-
-      )
+    initAllReview() {
+      this.$axiosPostWithQuery('reviewRecord/list', null, this.pageInfo).then((res) => {
+        this.msgData = res.result.data.records;
+        this.pagination.current = this.pageInfo.current;
+        this.pagination.pageSize = this.pageInfo.Size;
+        this.pagination.total = res.result.total;
+      });
     },
     onCurrentChange(current: number): void {
       this.pagination.current = current;
       this.pageInfo = {
-        current: current,
-        Size:this.pagination.pageSize,
-      }
-      this.initData();
+        current,
+        Size: this.pagination.pageSize,
+      };
+      this.initAllReview();
+    },
+    onPageSizeChange(size: number): void {
+      this.pageInfo = {
+        current: 1,
+        Size: size,
+      };
+      this.initAllReview();
     },
     onSubmit({ result, firstError }): void {
       if (!firstError) {
@@ -142,24 +149,18 @@ export default {
         this.$message.warning(firstError);
       }
     },
-    initUnreadReview(){
-
-    },
-    initReadReview(){
-
-    },
+    initUnreadReview() {},
+    initReadReview() {},
     handleClickDeleteBtn(item: msgDataItem): void {
       this.visible = true;
       this.selectedItem = item;
     },
-    setReadStatus(item: msgDataItem): void {
-      const changeMsg = this.msgData;
-      changeMsg.forEach((e) => {
-        if (e.id === item.id) {
-          if (e.status) e.status = false;
-        }
+    async setReadStatus(item: msgDataItem): void {
+      const routeUrl = this.$router.replace({
+        path: '/review/ReviewDetail',
+        query: { id: item.id },
       });
-      this.$store.commit('notification/setMsgData', changeMsg);
+      await window.open(routeUrl.href, '_self');
     },
     deleteMsg(): void {
       const item = this.selectedItem;
